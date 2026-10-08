@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Contact — Finlogik</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="/" class="logo">
+        FIN<span>LOGIK</span><span class="logo-arrow">&rsaquo;</span>
+      </a>
+      <div class="nav-links">
+        <a href="/">Produits</a>
+        <a href="/contact" class="active">Contact</a>
+      </div>
+    </nav>
+
+    <section class="page-title-bar">
+      <span class="title-icon">@</span>
+      <h1>Contact</h1>
+    </section>
+
+    <div class="container">
+      <div class="card">
+        <form method="POST">
+          <div class="field">
+            <label>Nom / Prénom</label>
+            <input type="text" name="nom" placeholder="Votre nom" required />
+          </div>
+          <div class="field">
+            <label>Message</label>
+            <textarea name="message" placeholder="Votre message"></textarea>
+          </div>
+          <div class="form-footer">
+            <button type="submit">Envoyer le message</button>
+          </div>
+        </form>
+
+        {% if message_envoye %}
+        <p class="alert-success">
+          <span aria-hidden="true">&#10003;</span>
+          Message envoyé avec succès !
+        </p>
+        {% endif %}
+      </div>
+
+      <a href="/" class="retour-link">&larr; Retour à la liste des produits</a>
+    </div>
+
+    <footer>
+      <div class="footer-brand">FIN<span>LOGIK</span></div>
+      <p>&copy; Finlogik — Simulateur de produits financiers</p>
+    </footer>
+  </body>
+</html>

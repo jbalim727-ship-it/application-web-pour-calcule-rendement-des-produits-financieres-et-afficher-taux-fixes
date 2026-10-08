@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS produits;
+
+CREATE TABLE produits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nom TEXT NOT NULL,
+    description TEXT,
+    taux REAL NOT NULL
+)

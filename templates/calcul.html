@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calcul du rendement — Finlogik</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="logo">
+      FIN<span>LOGIK</span><span class="logo-arrow">&rsaquo;</span>
+    </a>
+    <div class="nav-links">
+      <a href="/">Produits</a>
+      <a href="/contact">Contact</a>
+    </div>
+  </nav>
+
+  <section class="page-title-bar">
+    <span class="title-icon">%</span>
+    <h1>{{ produit['nom'] }}</h1>
+  </section>
+
+  <div class="container">
+    <div class="calc-grid">
+      <div class="card">
+        <form method="POST" id="form-calcul">
+          <div class="field">
+            <label for="montant">Montant (DT)</label>
+            <input type="number" id="montant" name="montant" step="0.01" placeholder="Ex. 5000" required>
+          </div>
+
+          <div class="field">
+            <label for="duree">Durée (an(s))</label>
+            <input type="number" id="duree" name="duree" step="1" min="1" value="{{ produit['duree'] }}" required>
+          </div>
+
+          <div class="field taux-live">
+            <label for="taux">Taux (%)</label>
+            <input type="number" id="taux" name="taux" step="0.01" value="{{ taux_utilise }}" readonly>
+            <span class="field-hint" id="taux-hint">Ajusté automatiquement selon la durée choisie.</span>
+          </div>
+
+          <div class="form-footer">
+            <button type="submit">Calculer le rendement</button>
+          </div>
+        </form>
+      </div>
+
+      {% if resultat %}
+      <div class="resultat">
+        <h2>Résultat de la simulation</h2>
+        <div class="ligne">
+          <span>Montant initial</span>
+          <span>{{ resultat['montant_initial'] }} DT</span>
+        </div>
+        <div class="ligne">
+          <span>Intérêt généré</span>
+          <span>{{ resultat['interet'] }} DT</span>
+        </div>
+        <div class="ligne total">
+          <span>Total</span>
+          <span>{{ resultat['total'] }} DT</span>
+        </div>
+      </div>
+      {% else %}
+      <div class="resultat-placeholder">
+        Renseignez un montant et lancez le calcul pour voir votre rendement estimé s'afficher ici.
+      </div>
+      {% endif %}
+    </div>
+
+    <a href="/" class="retour-link">&larr; Retour à la liste des produits</a>
+  </div>
+
+  <footer>
+    <div class="footer-brand">FIN<span>LOGIK</span></div>
+    <p>&copy; Finlogik — Simulateur de produits financiers</p>
+  </footer>
+
+  <script id="courbe-data" type="application/json">{{ courbe_taux_json | safe }}</script>
+  <script>
+    (function () {
+      var points = JSON.parse(document.getElementById('courbe-data').textContent);
+      points.sort(function (a, b) { return a.duree - b.duree; });
+
+      function interpolerTaux(duree) {
+        if (!points.length) return null;
+        if (duree <= points[0].duree) return points[0].taux;
+        if (duree >= points[points.length - 1].duree) return points[points.length - 1].taux;
+
+        for (var i = 0; i < points.length - 1; i++) {
+          var a = points[i], b = points[i + 1];
+          if (duree >= a.duree && duree <= b.duree) {
+            var ratio = (duree - a.duree) / (b.duree - a.duree);
+            return a.taux + ratio * (b.taux - a.taux);
+          }
+        }
+        return points[points.length - 1].taux;
+      }
+
+      var dureeInput = document.getElementById('duree');
+      var tauxInput = document.getElementById('taux');
+      var hint = document.getElementById('taux-hint');
+      var tauxInitial = parseFloat(tauxInput.value);
+
+      function majTaux() {
+        var duree = parseFloat(dureeInput.value);
+        if (isNaN(duree) || duree <= 0) return;
+
+        var nouveauTaux = interpolerTaux(duree);
+        nouveauTaux = Math.round(nouveauTaux * 100) / 100;
+        tauxInput.value = nouveauTaux;
+
+        if (nouveauTaux !== tauxInitial) {
+          hint.textContent = 'Taux ajusté à ' + nouveauTaux + '% pour ' + duree + ' an(s).';
+          hint.classList.add('is-updated');
+        } else {
+          hint.textContent = 'Taux du produit pour cette durée.';
+          hint.classList.remove('is-updated');
+        }
+      }
+
+      dureeInput.addEventListener('input', majTaux);
+      majTaux();
+    })();
+  </script>
+</body>
+</html>

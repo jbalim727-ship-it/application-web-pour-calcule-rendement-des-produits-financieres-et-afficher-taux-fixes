@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Finlogik — Produits Financiers</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <a href="/" class="logo">
+        FIN<span>LOGIK</span><span class="logo-arrow">&rsaquo;</span>
+      </a>
+      <div class="nav-links">
+        <a href="/" class="active">Produits</a>
+        <a href="/contact">Contact</a>
+      </div>
+    </nav>
+
+    <section class="page-title-bar">
+      <span class="title-icon">&#8801;</span>
+      <h1>Produits financiers</h1>
+    </section>
+
+    <div class="container">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Taux</th>
+              <th>Durée</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in produits %}
+            <tr>
+              <td><span class="produit-nom">{{ p['nom'] }}</span></td>
+              <td><span class="badge-taux">{{ p['taux'] }}%</span></td>
+              <td>{{ p['duree'] }} an(s)</td>
+              <td>
+                <a class="btn btn-sm" href="{{ url_for('calcul', produit_id=p['id']) }}">
+                  Calculer
+                  <span aria-hidden="true">&rarr;</span>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer-brand">FIN<span>LOGIK</span></div>
+      <p>&copy; Finlogik — Simulateur de produits financiers</p>
+    </footer>
+  </body>
+</html>
